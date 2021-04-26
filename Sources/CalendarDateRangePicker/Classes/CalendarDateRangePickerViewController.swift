@@ -325,7 +325,7 @@ extension CalendarDateRangePickerViewController: UICollectionViewDelegateFlowLay
         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding = collectionViewInsets.left + collectionViewInsets.right
         let availableWidth = view.frame.width - padding
-        let itemWidth = availableWidth / CGFloat(itemsPerRow)
+        let itemWidth = (availableWidth / CGFloat(itemsPerRow)).rounded(.up)
         return CGSize(width: itemWidth, height: itemHeight)
     }
 
