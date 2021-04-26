@@ -10,10 +10,10 @@
 import UIKit
 
 @objc public protocol CalendarDateRangePickerViewControllerDelegate: class {
-    func didCancelPickingDateRange()
-    func didPickDateRange(startDate: Date!, endDate: Date!)
-    func didSelectStartDate(startDate: Date!)
-    func didSelectEndDate(endDate: Date!)
+    func didCancelPickingDateRange(calendar: CalendarDateRangePickerViewController)
+    func didPickDateRange(calendar: CalendarDateRangePickerViewController, startDate: Date!, endDate: Date!)
+    func didSelectStartDate(calendar: CalendarDateRangePickerViewController, startDate: Date!)
+    func didSelectEndDate(calendar: CalendarDateRangePickerViewController, endDate: Date!)
 }
 
 @objcMembers public class CalendarDateRangePickerViewController: UICollectionViewController {
@@ -27,8 +27,8 @@ import UIKit
     let itemHeight: CGFloat = 40
     let collectionViewInsets = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
 
-    public var minimumDate: Date!
-    public var maximumDate: Date!
+    public var minimumDate: Date = Calendar.current.date(byAdding: .year, value: -10, to: Date()) ?? Date()
+    public var maximumDate: Date = Date()
     public var locale: Locale?
 
     public var selectedStartDate: Date?
@@ -91,13 +91,6 @@ import UIKit
         collectionView?.register(CalendarDateRangePickerHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerReuseIdentifier)
         collectionView?.contentInset = collectionViewInsets
 
-        if minimumDate == nil {
-            minimumDate = Date()
-        }
-        if maximumDate == nil {
-            maximumDate = Calendar.current.date(byAdding: .year, value: 3, to: minimumDate)
-        }
-
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: cancelText, style: .plain, target: self, action: #selector(CalendarDateRangePickerViewController.didTapCancel))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: doneText, style: .done, target: self, action: #selector(CalendarDateRangePickerViewController.didTapDone))
         
@@ -109,7 +102,7 @@ import UIKit
     }
 
     @objc func didTapCancel() {
-        delegate.didCancelPickingDateRange()
+        delegate.didCancelPickingDateRange(calendar: self)
     }
 
     @objc func didTapDone() {
@@ -121,7 +114,7 @@ import UIKit
                 selectedEndDate = selectedStartDate
             }
         }
-        delegate.didPickDateRange(startDate: selectedStartDate!, endDate: selectedEndDate!)
+        delegate.didPickDateRange(calendar: self, startDate: selectedStartDate!, endDate: selectedEndDate!)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -306,22 +299,22 @@ extension CalendarDateRangePickerViewController: UICollectionViewDelegateFlowLay
         if selectedStartDate == nil || selectionMode == .single {
             selectedStartDate = cell.date
             selectedStartCell = indexPath
-            delegate.didSelectStartDate(startDate: selectedStartDate)
+            delegate.didSelectStartDate(calendar: self, startDate: selectedStartDate)
         } else if selectedEndDate == nil {
             if isBefore(dateA: selectedStartDate!, dateB: cell.date!) && !isBetween(selectedStartCell!, and: indexPath) {
                 selectedEndDate = cell.date
-                delegate.didSelectEndDate(endDate: selectedEndDate)
+                delegate.didSelectEndDate(calendar: self, endDate: selectedEndDate)
                 self.navigationItem.rightBarButtonItem?.isEnabled = true
             } else {
                 // If a cell before the currently selected start date is selected then just set it as the new start date
                 selectedStartDate = cell.date
                 selectedStartCell = indexPath
-                delegate.didSelectStartDate(startDate: selectedStartDate)
+                delegate.didSelectStartDate(calendar: self, startDate: selectedStartDate)
             }
         } else {
             selectedStartDate = cell.date
             selectedStartCell = indexPath
-            delegate.didSelectStartDate(startDate: selectedStartDate)
+            delegate.didSelectStartDate(calendar: self, startDate: selectedStartDate)
             selectedEndDate = nil
         }
         collectionView.reloadData()
