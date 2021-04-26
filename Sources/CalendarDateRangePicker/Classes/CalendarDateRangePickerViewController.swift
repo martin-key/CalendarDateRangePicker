@@ -11,9 +11,9 @@ import UIKit
 
 @objc public protocol CalendarDateRangePickerViewControllerDelegate: class {
     func didCancelPickingDateRange(calendar: CalendarDateRangePickerViewController)
-    func didPickDateRange(calendar: CalendarDateRangePickerViewController, startDate: Date!, endDate: Date!)
-    func didSelectStartDate(calendar: CalendarDateRangePickerViewController, startDate: Date!)
-    func didSelectEndDate(calendar: CalendarDateRangePickerViewController, endDate: Date!)
+    func didPickDateRange(calendar: CalendarDateRangePickerViewController, startDate: Date?, endDate: Date?)
+    func didSelectStartDate(calendar: CalendarDateRangePickerViewController, startDate: Date?)
+    func didSelectEndDate(calendar: CalendarDateRangePickerViewController, endDate: Date?)
 }
 
 @objcMembers public class CalendarDateRangePickerViewController: UICollectionViewController {
